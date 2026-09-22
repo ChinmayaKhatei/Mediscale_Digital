@@ -11,34 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Specialty Tabs Switching
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const calcSpecialty = document.getElementById('calc-specialty');
-
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabId = btn.getAttribute('data-tab');
-            
-            // Switch tabs
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            
-            btn.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-
-            // Sync with ROI calculator specialty dropdown
-            if (tabId === 'dentists' && calcSpecialty) {
-                calcSpecialty.value = 'dentist';
-                updateCalculatorDefaults('dentist');
-            } else if (tabId === 'ophthalmologists' && calcSpecialty) {
-                calcSpecialty.value = 'ophthalmic';
-                updateCalculatorDefaults('ophthalmic');
-            }
-        });
-    });
-
-    // 3. Interactive ROI Calculator Logic
+    // 2. Interactive Ophthalmic ROI Calculator Logic
+    const procedureSelect = document.getElementById('calc-procedure');
     const budgetInput = document.getElementById('calc-budget');
     const budgetValue = document.getElementById('budget-val');
     const ticketInput = document.getElementById('calc-ticket');
@@ -49,6 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultRevenue = document.getElementById('res-revenue');
     const resultRoi = document.getElementById('res-roi');
 
+    const procedures = {
+        lasik:    { label: "LASIK / SMILE",              value: 100000, cpql: 1750, bookingRate: 0.34 },
+        cataract: { label: "Premium Cataract (Multifocal/Trifocal)", value: 160000, cpql: 1550, bookingRate: 0.30 },
+        icl:      { label: "ICL (Implantable Collamer Lens)", value: 200000, cpql: 2000, bookingRate: 0.28 }
+    };
+
     function formatCurrency(value) {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -57,57 +37,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }).format(value);
     }
 
-    function updateCalculatorDefaults(specialty) {
-        if (specialty === 'dentist') {
-            // Typical dental implant / Invisalign ticket size in INR: e.g. 40,000
-            ticketInput.min = 5000;
-            ticketInput.max = 150000;
-            ticketInput.value = 45000;
-            ticketInput.step = 5000;
-        } else {
-            // Typical LASIK / Cataract ticket size in INR: e.g. 70,000
-            ticketInput.min = 10000;
-            ticketInput.max = 250000;
-            ticketInput.value = 85000;
-            ticketInput.step = 5000;
-        }
-        ticketValue.textContent = formatCurrency(ticketInput.value);
-        calculateROI();
-    }
-
     function calculateROI() {
-        const specialty = calcSpecialty ? calcSpecialty.value : 'dentist';
-        const budget = parseInt(budgetInput.value);
-        const ticket = parseInt(ticketInput.value);
+        const procKey = procedureSelect ? procedureSelect.value : 'lasik';
+        const proc = procedures[procKey] || procedures.lasik;
+        const budget = parseInt(budgetInput.value) || 0;
+        const avgTreatmentValue = proc.value;
 
-        // Update range labels
-        budgetValue.textContent = formatCurrency(budget);
-        ticketValue.textContent = formatCurrency(ticket);
+        // Update display labels
+        if (budgetValue) budgetValue.textContent = formatCurrency(budget);
+        if (ticketValue) ticketValue.textContent = formatCurrency(avgTreatmentValue);
+        if (ticketInput) ticketInput.value = avgTreatmentValue;
 
-        // Benchmark variables based on our historical data
-        // Dentist: CPL ~500 INR, CPQL ~1100 INR. Booking rate with support ~38%
-        // Ophthalmic: CPL ~750 INR, CPQL ~1600 INR. Booking rate with support ~34%
-        let cpql = specialty === 'dentist' ? 1200 : 1800;
-        let bookingRate = specialty === 'dentist' ? 0.38 : 0.34;
+        // Formula:
+        // qualifiedLeads = adBudget / cpql
+        // bookedConsultations = qualifiedLeads * bookingRate
+        // projectedRevenue = bookedConsultations * avgTreatmentValue
+        // estimatedROAS = projectedRevenue / adBudget
+        const qualifiedLeads = Math.round(budget / proc.cpql);
+        const bookedConsultations = Math.round(qualifiedLeads * proc.bookingRate);
+        const projectedRevenue = bookedConsultations * avgTreatmentValue;
+        const estimatedROAS = budget > 0 ? Math.round(projectedRevenue / budget) : 0;
 
-        // Calculate metrics
-        const qualifiedLeads = Math.floor(budget / cpql);
-        const patientsBooked = Math.floor(qualifiedLeads * bookingRate);
-        const estimatedRevenue = patientsBooked * ticket;
-        
-        let roiMultiplier = budget > 0 ? (estimatedRevenue / budget).toFixed(1) : 0;
-
-        // Animate results update
-        animateValue(resultLeads, qualifiedLeads);
-        animateValue(resultBookings, patientsBooked);
-        resultRevenue.textContent = formatCurrency(estimatedRevenue);
-        resultRoi.textContent = `${roiMultiplier}x`;
+        // Animate results
+        if (resultLeads) animateValue(resultLeads, qualifiedLeads);
+        if (resultBookings) animateValue(resultBookings, bookedConsultations);
+        if (resultRevenue) resultRevenue.textContent = formatCurrency(projectedRevenue);
+        if (resultRoi) resultRoi.textContent = `${estimatedROAS}x`;
     }
 
     function animateValue(element, target) {
         let current = parseInt(element.textContent) || 0;
         if (current === target) return;
-        const duration = 400;
+        const duration = 300;
         const stepTime = 30;
         const steps = duration / stepTime;
         const increment = (target - current) / steps;
@@ -124,29 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, stepTime);
     }
 
-    if (budgetInput && ticketInput && calcSpecialty) {
+    if (budgetInput && procedureSelect) {
         budgetInput.addEventListener('input', calculateROI);
-        ticketInput.addEventListener('input', calculateROI);
-        calcSpecialty.addEventListener('change', () => {
-            updateCalculatorDefaults(calcSpecialty.value);
-            // Switch tabs corresponding to calculator dropdown selection
-            const targetTab = calcSpecialty.value === 'dentist' ? 'dentists' : 'ophthalmologists';
-            tabBtns.forEach(btn => {
-                if (btn.getAttribute('data-tab') === targetTab) {
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                }
-            });
-            tabContents.forEach(c => {
-                if (c.getAttribute('id') === targetTab) {
-                    tabContents.forEach(tc => tc.classList.remove('active'));
-                    c.classList.add('active');
-                }
-            });
-        });
-
-        // Initialize values
-        updateCalculatorDefaults('dentist');
+        procedureSelect.addEventListener('change', calculateROI);
+        // Initialize default
+        calculateROI();
     }
 
     // 4. Simulated Video Player Interactions
@@ -267,17 +210,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Collect form data
             const name = document.getElementById('form-name').value;
             const clinic = document.getElementById('form-clinic').value;
-            const specialty = document.getElementById('form-specialty').value;
+            const procedure = document.getElementById('form-specialty').value;
             
+            const procedureLabels = {
+                lasik: 'LASIK / SMILE',
+                cataract: 'Premium Cataract',
+                icl: 'ICL',
+                comprehensive: 'Comprehensive Eye Surgery OT'
+            };
+            const procedureLabel = procedureLabels[procedure] || 'Ophthalmic';
+
             // Display simulated success state
             const modalCard = modal.querySelector('.modal-card');
             modalCard.innerHTML = `
                 <div style="text-align:center;padding:30px 10px;">
                     <div style="width:70px;height:70px;background:rgba(16,185,129,0.1);border-radius:50%;border:2px solid var(--accent);display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;color:var(--accent);font-size:32px;animation:float 3s ease-in-out infinite;">✓</div>
-                    <h3 style="font-size:24px;font-family:'Outfit',sans-serif;margin-bottom:12px;color:var(--text-main);">Diagnostic Requested!</h3>
+                    <h3 style="font-size:24px;font-family:'Outfit',sans-serif;margin-bottom:12px;color:var(--text-main);">Strategy Blueprint Requested!</h3>
                     <p style="font-size:15px;color:var(--text-muted);line-height:1.6;margin-bottom:30px;">
-                        Thank you, <strong>${name}</strong>. We are preparing a custom patient acquisition blueprint for <strong>${clinic}</strong> (${specialty === 'dentist' ? 'Dental' : 'Ophthalmic'} focus). 
-                        Our team will contact you within the next 24 hours to schedule your session.
+                        Thank you, <strong>${name}</strong>. We are preparing an ophthalmic patient acquisition blueprint for <strong>${clinic}</strong> with a focus on <strong>${procedureLabel}</strong>. 
+                        Our team will contact you within the next 24 hours to schedule your strategy session.
                     </p>
                     <button class="btn btn-primary" id="success-close-btn" style="width:100%;">Return to Website</button>
                 </div>

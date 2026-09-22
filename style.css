@@ -1210,6 +1210,196 @@ h1, h2, h3, h4, h5, h6 {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* Exclusive Focus Badge */
+.focus-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background: rgba(0, 242, 254, 0.08);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    color: var(--primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+    white-space: nowrap;
+}
+.focus-badge .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+}
+
+/* Ophthalmology 3-Card Mastery Grid */
+.mastery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+.mastery-card {
+    padding: 36px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+.mastery-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    opacity: 0;
+    transition: var(--transition);
+}
+.mastery-card:hover::before {
+    opacity: 1;
+}
+.mastery-icon {
+    font-size: 28px;
+    background: rgba(0, 242, 254, 0.1);
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    border: 1px solid var(--border-glass);
+}
+.mastery-card h3 {
+    font-size: 20px;
+    margin-bottom: 14px;
+    color: var(--text-main);
+}
+.mastery-card p {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    line-height: 1.65;
+}
+
+/* Mock WhatsApp Conversation Box */
+.chat-mock-container {
+    margin-top: 40px;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 16px;
+    border: 1px solid var(--border-glass);
+    background: rgba(11, 20, 36, 0.85);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+.chat-header {
+    background: rgba(15, 23, 42, 0.95);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.chat-header-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.chat-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #070b19;
+    font-size: 14px;
+}
+.chat-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+.chat-status {
+    font-size: 11.5px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.chat-status::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+}
+.chat-body {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: radial-gradient(circle at center, rgba(0, 242, 254, 0.02) 0%, transparent 70%);
+}
+.chat-bubble {
+    max-width: 82%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+}
+.chat-bubble-patient {
+    align-self: flex-start;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--border-glass);
+    color: var(--text-main);
+    border-bottom-left-radius: 4px;
+}
+.chat-bubble-system {
+    align-self: flex-end;
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(0, 242, 254, 0.15) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    color: var(--text-main);
+    border-bottom-right-radius: 4px;
+}
+.chat-bubble-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    color: var(--primary);
+}
+.chat-bubble-patient .chat-bubble-label {
+    color: var(--text-muted);
+}
+.chat-timestamp {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: right;
+    margin-top: 4px;
+}
+
+.table-note {
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+    text-align: center;
+    font-style: italic;
+}
 
 /* Media Queries */
 @media (max-width: 992px) {

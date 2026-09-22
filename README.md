@@ -12,9 +12,9 @@ Dynamic calculation engine accepting dual range sliders (Ad Budget & Average Pat
 Outputs qualified leads, estimated patient bookings, projected revenue, and ROI multipliers.
 Uses a step-increment interval timer (animateValue) to count up/down values smoothly in real-time.
 Formatted using native currency formatters (Intl.NumberFormat) with standard Indian Rupee (INR) layout.
-Specialty Tab Switcher:
-Synchronized tabs that switch between Dentists and Ophthalmologists.
-Toggling these tabs automatically resets the ROI calculator's min/max ranges and average benchmark metrics (CPL, booking rates, and ticket sizes).
+Ophthalmic Procedure-Aware Funnel Architecture:
+High-converting specialized funnels for LASIK, SMILE, ICL, and Premium Cataract surgeries.
+Calibrated against real-world benchmark metrics (CPQL, booking rates, and procedure ticket sizes) compliant with NMC regulations.
 Custom Case Study Video Simulator:
 Replaces static preview cards with a simulated custom video-player overlay.
 Features a progress-bar simulator with countdown timers, culminating in an automated call-to-action state to boost user lead conversion.
@@ -35,7 +35,7 @@ markdown
 
 
 # MediScale Digital Landing Page
-A high-performance, premium landing page designed for **MediScale Digital**—a patient acquisition system tailored for dentists and ophthalmologists.
+A high-performance, premium landing page designed for **MediScale Digital**—a specialist patient acquisition agency exclusively for eye surgeons and ophthalmology clinics (LASIK, SMILE, ICL, and Premium Cataract).
 ## 🛠️ Tech Stack & Tools
 * **Frontend Structure:** HTML5 (Semantic elements, metadata optimization for SEO, and social Graph tags)
 * **Styling System:** Vanilla CSS3 (Custom variables, CSS Grid, Flexbox, and responsive design systems)
@@ -45,8 +45,8 @@ A high-performance, premium landing page designed for **MediScale Digital**—a 
   - Custom glowing ambient radial background blobs
   - Dynamic responsive Inline SVGs with linear gradients
 ## 🚀 Key Interactive Features
-1. **Interactive ROI Calculator:** Real-time patient acquisition forecasting engine using customizable budget and ticket-size sliders. Features count-up metric animations and localized currency formatting (`Intl.NumberFormat`).
-2. **Dynamic Specialty Switcher:** Seamless UI tabs to view specialized setups for dentists or eye clinics, syncing active states directly with the calculator's values.
+1. **Interactive ROI Calculator:** Real-time procedure-aware patient acquisition forecasting engine with presets for LASIK / SMILE, Premium Cataract, and ICL. Features count-up metric animations and localized currency formatting (`Intl.NumberFormat`).
+2. **One Focus Mastery Architecture:** Deep clinical understanding of refractive vs. cataract patient psychology and NMC compliance.
 3. **Simulated Case Study Player:** Custom interactive video demonstration container showcasing client walkthroughs and ending in a direct booking conversion state.
 4. **Lead Modal System:** Floating diagnostic booking modal with form interceptors, viewport scroll-locks, and a dynamic success panel.
 5. **Interactive FAQ Accordion:** Clean collapsible lists with slide-down max-height layout changes.
