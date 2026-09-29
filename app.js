@@ -11,6 +11,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 1b. Mobile Navigation Drawer Toggle
+    const mobileBtn = document.querySelector('.mobile-menu-btn');
+    const navMenuWrapper = document.querySelector('.nav-menu-wrapper');
+    const navLinks = document.querySelectorAll('.nav-menu .nav-link');
+
+    if (mobileBtn && navMenuWrapper) {
+        mobileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = mobileBtn.classList.toggle('active');
+            navMenuWrapper.classList.toggle('active', isOpen);
+            mobileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileBtn.classList.remove('active');
+                navMenuWrapper.classList.remove('active');
+                mobileBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        // Close drawer when clicking outside
+        document.addEventListener('click', (e) => {
+            if (navMenuWrapper.classList.contains('active') && !header.contains(e.target)) {
+                mobileBtn.classList.remove('active');
+                navMenuWrapper.classList.remove('active');
+                mobileBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
     // 2. Interactive Ophthalmic ROI Calculator Logic
     const procedureSelect = document.getElementById('calc-procedure');
     const budgetInput = document.getElementById('calc-budget');
