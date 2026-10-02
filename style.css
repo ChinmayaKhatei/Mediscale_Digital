@@ -1550,6 +1550,504 @@ h1, h2, h3, h4, h5, h6 {
     font-style: italic;
 }
 
+/* ========================================================
+   Prius Healthcare Inspired Authority & Conversion Features
+   ======================================================== */
+
+/* 1. Measurable Impact Section */
+.impact-section {
+    padding: 60px 0 80px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+    position: relative;
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.impact-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 40px;
+}
+
+.impact-card {
+    padding: 32px 24px;
+    text-align: center;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.impact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.6;
+}
+
+.impact-icon-wrap {
+    font-size: 28px;
+    margin-bottom: 16px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(0, 242, 254, 0.06);
+    border: 1px solid rgba(0, 242, 254, 0.15);
+}
+
+.impact-num-wrap {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px;
+    margin-bottom: 10px;
+}
+
+.impact-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.impact-unit {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.impact-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.impact-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* 2. In-House Clinical Advisory Desk Highlight */
+.clinical-review-card {
+    padding: 40px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(7, 11, 25, 0.9) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.clinical-review-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 0.9fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.clinical-badge-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #10b981;
+    margin-bottom: 16px;
+}
+
+.clinical-review-content h3 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    line-height: 1.25;
+}
+
+.clinical-review-content p {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.clinical-perks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.perk-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.perk-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.perk-item strong {
+    font-size: 14.5px;
+    color: var(--text-main);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.perk-item p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.45;
+}
+
+.compliance-shield-box {
+    background: rgba(2, 6, 23, 0.65);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    border-radius: 16px;
+    padding: 32px 26px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.shield-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.4));
+}
+
+.compliance-shield-box h4 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.compliance-shield-box p {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+}
+
+.shield-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 18px;
+}
+
+.shield-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.stat-highlight {
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14.5px;
+}
+
+/* 3. Comparison Section (MediScale vs Generic Agencies) */
+.comparison-section {
+    position: relative;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.comparison-table-wrapper {
+    margin-top: 45px;
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid var(--border-glass);
+    background: rgba(15, 23, 42, 0.5);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 720px;
+}
+
+.comparison-table th {
+    padding: 20px 24px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.comparison-table th.col-generic {
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.comparison-table th.col-mediscale {
+    color: var(--primary);
+    background: rgba(0, 242, 254, 0.07);
+    border-left: 1px solid rgba(0, 242, 254, 0.2);
+    border-right: 1px solid rgba(0, 242, 254, 0.2);
+}
+
+.comparison-table td {
+    padding: 18px 24px;
+    font-size: 13.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+}
+
+.comparison-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.comparison-table td.col-generic {
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.comparison-table td.col-mediscale {
+    color: var(--text-main);
+    background: rgba(0, 242, 254, 0.035);
+    border-left: 1px solid rgba(0, 242, 254, 0.15);
+    border-right: 1px solid rgba(0, 242, 254, 0.15);
+}
+
+.check-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    font-weight: bold;
+    font-size: 12px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.cross-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    font-weight: bold;
+    font-size: 11px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* 4. Complimentary Blueprint Section */
+.blueprint-section {
+    position: relative;
+}
+
+.blueprint-card {
+    padding: 48px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(7, 11, 25, 0.98) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+}
+
+.blueprint-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 48px;
+    align-items: center;
+}
+
+.blueprint-perks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.blueprint-perk {
+    display: flex;
+    gap: 16px;
+}
+
+.perk-bullet {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.blueprint-perk h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text-main);
+}
+
+.blueprint-perk p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.blueprint-form-card {
+    background: rgba(7, 11, 25, 0.7);
+    border: 1px solid var(--border-glass);
+    border-radius: 18px;
+    padding: 32px 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.blueprint-form-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+/* 5. Floating Sticky Care Desk Bar */
+.floating-care-desk {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 998;
+    background: rgba(11, 19, 38, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    border-radius: 9999px;
+    padding: 6px 8px 6px 16px;
+    box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.floating-care-desk:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 14px 40px -5px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 242, 254, 0.25);
+}
+
+.care-desk-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.care-desk-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.status-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.care-desk-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.care-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 13px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.care-pill-btn.btn-wa {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #10b981;
+}
+
+.care-pill-btn.btn-wa:hover {
+    background: #10b981;
+    color: #070b19;
+}
+
+.care-pill-btn.btn-call {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.care-pill-btn.btn-call:hover {
+    background: var(--primary);
+    color: #070b19;
+    border-color: var(--primary);
+}
+
+.care-pill-btn.btn-audit {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: #070b19;
+}
+
+.care-pill-btn.btn-audit:hover {
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+}
+
 /* Footer Social Links Styling */
 .footer-social-list {
     list-style: none;
