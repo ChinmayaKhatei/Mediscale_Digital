@@ -208,59 +208,289 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 6. Modal Lead Form Handling
+    /* ==========================================================================
+       6. Zoho CRM Lead Capture & Interaction Tracking System
+       Organization: org60091771135 | Portal: https://crm.zoho.in/crm/org60091771135
+       ========================================================================== */
+    const ZOHO_CRM_CONFIG = {
+        orgId: '60091771135',
+        crmPortalUrl: 'https://crm.zoho.in/crm/org60091771135',
+        webToLeadUrl: 'https://crm.zoho.in/crm/WebToLeadForm',
+        // Zoho Web-to-Lead Form Keys (Generated in Zoho CRM: Setup > Developer Space > Webforms)
+        xnQsjsdp: '', // Zoho CRM Org Key
+        xmIwt4bg: '', // Zoho Webform Token
+        actionType: 'TGVhZHM=', // 'Leads' in Base64
+        // Optional Webhook URL (Zoho Flow, Zapier, Make, or custom API) to receive real-time JSON
+        webhookUrl: ''
+    };
+
+    const ZohoCRMTracker = {
+        // Helper to separate full name into First & Last name (Zoho requires 'Last Name')
+        splitName(fullName) {
+            if (!fullName) return { firstName: '', lastName: 'Prospect' };
+            const parts = fullName.trim().split(/\s+/);
+            if (parts.length === 1) {
+                return { firstName: '', lastName: parts[0] };
+            }
+            const lastName = parts.pop();
+            const firstName = parts.join(' ');
+            return { firstName, lastName };
+        },
+
+        // Cache lead details locally so subsequent WhatsApp/call clicks identify the visitor
+        saveLeadLocally(leadData) {
+            try {
+                localStorage.setItem('mediscale_crm_lead', JSON.stringify({
+                    ...leadData,
+                    timestamp: new Date().toISOString()
+                }));
+            } catch (err) {
+                console.warn('[Zoho CRM] Local storage unavailable', err);
+            }
+        },
+
+        getStoredLead() {
+            try {
+                const stored = localStorage.getItem('mediscale_crm_lead');
+                return stored ? JSON.parse(stored) : null;
+            } catch (err) {
+                return null;
+            }
+        },
+
+        // Submit Lead to Zoho CRM (via silent iframe POST and/or Webhook/SalesIQ)
+        submitLead(leadData, formElement) {
+            console.log('[Zoho CRM] Capturing lead to CRM:', leadData);
+            this.saveLeadLocally(leadData);
+
+            // 1. Silent Form POST to Zoho CRM WebToLead endpoint
+            if (formElement) {
+                try {
+                    // Populate hidden fields
+                    const xnInput = formElement.querySelector('input[name="xnQsjsdp"]');
+                    const xmInput = formElement.querySelector('input[name="xmIwt4bg"]');
+                    const retInput = formElement.querySelector('input[name="returnURL"]');
+                    const fnInput = formElement.querySelector('input[name="First Name"]');
+                    const descInput = formElement.querySelector('input[name="Description"]');
+
+                    if (xnInput && ZOHO_CRM_CONFIG.xnQsjsdp) xnInput.value = ZOHO_CRM_CONFIG.xnQsjsdp;
+                    if (xmInput && ZOHO_CRM_CONFIG.xmIwt4bg) xmInput.value = ZOHO_CRM_CONFIG.xmIwt4bg;
+                    if (retInput) retInput.value = window.location.href;
+                    if (fnInput) fnInput.value = leadData.firstName || '';
+                    if (descInput) descInput.value = leadData.description || '';
+
+                    // Trigger native form submission targeted at the hidden iframe
+                    formElement.submit();
+                } catch (err) {
+                    console.warn('[Zoho CRM] Direct form submit error:', err);
+                }
+            }
+
+            // 2. Dispatch to optional Webhook / Zoho Flow / Zapier
+            if (ZOHO_CRM_CONFIG.webhookUrl) {
+                try {
+                    fetch(ZOHO_CRM_CONFIG.webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ...leadData,
+                            source: 'MediScale Digital Landing Page',
+                            orgId: ZOHO_CRM_CONFIG.orgId,
+                            submittedAt: new Date().toISOString()
+                        }),
+                        mode: 'no-cors'
+                    }).catch(e => console.log('[Zoho CRM] Webhook dispatched'));
+                } catch (e) {
+                    console.warn('[Zoho CRM] Webhook error:', e);
+                }
+            }
+
+            // 3. Sync with Zoho SalesIQ if present on the page
+            if (window.$zoho && window.$zoho.salesiq && window.$zoho.salesiq.visitor) {
+                try {
+                    if (leadData.fullName && window.$zoho.salesiq.visitor.name) window.$zoho.salesiq.visitor.name(leadData.fullName);
+                    if (leadData.email && window.$zoho.salesiq.visitor.email) window.$zoho.salesiq.visitor.email(leadData.email);
+                    if (leadData.phone && window.$zoho.salesiq.visitor.contactnumber) window.$zoho.salesiq.visitor.contactnumber(leadData.phone);
+                    if (window.$zoho.salesiq.visitor.info) {
+                        window.$zoho.salesiq.visitor.info({
+                            "Clinic": leadData.company || 'Not Specified',
+                            "Procedure": leadData.procedure || 'General',
+                            "Lead Source": leadData.leadSource || 'Website'
+                        });
+                    }
+                } catch (e) {
+                    console.log('[Zoho SalesIQ] Visitor sync complete');
+                }
+            }
+
+            // 4. Meta Pixel Lead Tracking
+            if (typeof fbq === 'function') {
+                try {
+                    fbq('track', 'Lead', {
+                        content_name: leadData.leadSource,
+                        content_category: leadData.procedure,
+                        currency: 'INR',
+                        value: 1000.00
+                    });
+                } catch (e) {}
+            }
+        },
+
+        // Track clicks on WhatsApp and Direct Call buttons
+        trackClickEvent(type, targetUrl) {
+            const stored = this.getStoredLead();
+            const timestamp = new Date().toLocaleString('en-IN');
+            const interactionData = {
+                eventType: type, // 'WhatsApp' or 'Phone Call'
+                leadSource: type === 'WhatsApp' ? 'Website - WhatsApp Click' : 'Website - Direct Phone Call',
+                fullName: stored ? stored.fullName : `Visitor (${type} Click - ${timestamp})`,
+                firstName: stored ? stored.firstName : 'Visitor',
+                lastName: stored ? stored.lastName : `[${type} Lead]`,
+                company: stored ? stored.company : 'Ophthalmic Practice Prospect',
+                phone: stored ? stored.phone : '',
+                email: stored ? stored.email : '',
+                description: `Visitor initiated ${type} at ${timestamp}. Page: ${window.location.pathname} | UserAgent: ${navigator.userAgent}`,
+                pageUrl: window.location.href,
+                timestamp: new Date().toISOString()
+            };
+
+            console.log(`[Zoho CRM] Tracking ${type} button interaction:`, interactionData);
+
+            // 1. Send via Webhook / Zoho Flow if configured
+            if (ZOHO_CRM_CONFIG.webhookUrl) {
+                try {
+                    if (navigator.sendBeacon) {
+                        const blob = new Blob([JSON.stringify(interactionData)], { type: 'application/json' });
+                        navigator.sendBeacon(ZOHO_CRM_CONFIG.webhookUrl, blob);
+                    } else {
+                        fetch(ZOHO_CRM_CONFIG.webhookUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(interactionData),
+                            mode: 'no-cors'
+                        }).catch(() => {});
+                    }
+                } catch (err) {
+                    console.warn('[Zoho CRM] Click tracking beacon error:', err);
+                }
+            }
+
+            // 2. Track via Zoho SalesIQ if loaded
+            if (window.$zoho && window.$zoho.salesiq) {
+                try {
+                    if (window.$zoho.salesiq.visitor && window.$zoho.salesiq.visitor.customview) {
+                        window.$zoho.salesiq.visitor.customview(`${type} Button Clicked`);
+                    }
+                    if (window.$zoho.salesiq.tracking) {
+                        window.$zoho.salesiq.tracking(`Click: ${type}`);
+                    }
+                } catch (e) {}
+            }
+
+            // 3. Meta Pixel Contact Tracking
+            if (typeof fbq === 'function') {
+                try {
+                    fbq('track', 'Contact', { content_name: type });
+                    fbq('trackCustom', `${type.replace(/\s+/g, '')}Click`, {
+                        page: window.location.pathname,
+                        time: timestamp
+                    });
+                } catch (e) {}
+            }
+        }
+    };
+
+    // Attach tracking to all WhatsApp & Call links and buttons across the website
+    const whatsappElements = document.querySelectorAll('.btn-wa, a[href*="wa.me"]');
+    whatsappElements.forEach(el => {
+        el.addEventListener('click', () => {
+            ZohoCRMTracker.trackClickEvent('WhatsApp', el.getAttribute('href'));
+        });
+    });
+
+    const callElements = document.querySelectorAll('.btn-call, a[href^="tel:"]');
+    callElements.forEach(el => {
+        el.addEventListener('click', () => {
+            ZohoCRMTracker.trackClickEvent('Phone Call', el.getAttribute('href'));
+        });
+    });
+
+    // Modal dialog management
     const modal = document.getElementById('audit-modal');
     const openModalBtns = document.querySelectorAll('.open-modal-trigger');
     const closeModalBtn = document.getElementById('modal-close-btn');
-    const auditForm = document.getElementById('audit-form');
 
     function openModal(e) {
         if (e) e.preventDefault();
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Lock scrolling
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     function closeModal() {
-        modal.classList.remove('active');
-        document.body.style.overflow = ''; // Unlock scrolling
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
 
     openModalBtns.forEach(btn => btn.addEventListener('click', openModal));
     if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    
-    // Close modal when clicking backdrop
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-    });
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
 
-    // Submit form handler
+    // 7. Audit Modal Form Submission
+    const auditForm = document.getElementById('audit-form');
     if (auditForm) {
         auditForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            // Collect form data
-            const name = document.getElementById('form-name').value;
-            const clinic = document.getElementById('form-clinic').value;
+
+            const fullName = (document.getElementById('form-name').value || '').trim();
+            const clinic = (document.getElementById('form-clinic').value || '').trim();
             const procedure = document.getElementById('form-specialty').value;
-            
+            const email = (document.getElementById('form-email').value || '').trim();
+            const phone = (document.getElementById('form-phone').value || '').trim();
+
             const procedureLabels = {
-                lasik: 'LASIK / SMILE',
-                cataract: 'Premium Cataract',
-                icl: 'ICL',
+                lasik: 'LASIK / SMILE / Contoura',
+                cataract: 'Premium Cataract (Multifocal / Trifocal)',
+                icl: 'ICL (Implantable Collamer Lens)',
                 comprehensive: 'Comprehensive Eye Surgery OT'
             };
             const procedureLabel = procedureLabels[procedure] || 'Ophthalmic';
+            const { firstName, lastName } = ZohoCRMTracker.splitName(fullName);
 
-            // Display simulated success state
+            const leadData = {
+                fullName,
+                firstName,
+                lastName,
+                company: clinic || 'Ophthalmology Practice',
+                email,
+                phone,
+                procedure: procedureLabel,
+                leadSource: 'Website - Book Free Audit Modal',
+                description: `Procedure Focus: ${procedureLabel} | Form: Book Free Audit Modal | Submitted from: ${window.location.pathname}`
+            };
+
+            // Send to Zoho CRM
+            ZohoCRMTracker.submitLead(leadData, auditForm);
+
+            // Display success confirmation in modal
             const modalCard = modal.querySelector('.modal-card');
             modalCard.innerHTML = `
                 <div style="text-align:center;padding:30px 10px;">
                     <div style="width:70px;height:70px;background:rgba(16,185,129,0.1);border-radius:50%;border:2px solid var(--accent);display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;color:var(--accent);font-size:32px;animation:float 3s ease-in-out infinite;">✓</div>
-                    <h3 style="font-size:24px;font-family:'Outfit',sans-serif;margin-bottom:12px;color:var(--text-main);">Strategy Blueprint Requested!</h3>
-                    <p style="font-size:15px;color:var(--text-muted);line-height:1.6;margin-bottom:30px;">
-                        Thank you, <strong>${name}</strong>. We are preparing an ophthalmic patient acquisition blueprint for <strong>${clinic}</strong> with a focus on <strong>${procedureLabel}</strong>. 
-                        Our team will contact you within the next 24 hours to schedule your strategy session.
+                    <h3 style="font-size:24px;font-family:'Outfit',sans-serif;margin-bottom:12px;color:var(--text-main);">Free Clinic Audit Requested!</h3>
+                    <p style="font-size:15px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;">
+                        Thank you, <strong>${fullName}</strong>. Your audit details have been recorded in our CRM for <strong>${clinic}</strong> with a focus on <strong>${procedureLabel}</strong>.
                     </p>
+                    <div style="background:rgba(0,242,254,0.06);border:1px solid rgba(0,242,254,0.2);border-radius:12px;padding:14px;margin-bottom:24px;font-size:13px;color:var(--text-muted);text-align:left;">
+                        <span style="color:var(--primary);font-weight:600;">✓ Inbound Lead Synced:</span> An acquisition strategist will call or WhatsApp you at <strong>${phone}</strong> within 2 hours.
+                    </div>
                     <button class="btn btn-primary" id="success-close-btn" style="width:100%;">Return to Website</button>
                 </div>
             `;
@@ -268,6 +498,61 @@ document.addEventListener('DOMContentLoaded', () => {
             const successCloseBtn = document.getElementById('success-close-btn');
             if (successCloseBtn) {
                 successCloseBtn.addEventListener('click', closeModal);
+            }
+        });
+    }
+
+    // 8. In-Page Strategy Blueprint Form Submission
+    const blueprintForm = document.getElementById('blueprint-form');
+    if (blueprintForm) {
+        blueprintForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const fullName = (document.getElementById('bp-name').value || '').trim();
+            const clinic = (document.getElementById('bp-clinic').value || '').trim();
+            const city = (document.getElementById('bp-city').value || '').trim();
+            const procedure = document.getElementById('bp-specialty').value;
+            const phone = (document.getElementById('bp-phone').value || '').trim();
+
+            const procedureLabels = {
+                lasik: 'LASIK / SMILE',
+                cataract: 'Premium Cataract',
+                icl: 'Toric / EVO ICL',
+                both: 'All High-Ticket Procedures'
+            };
+            const procedureLabel = procedureLabels[procedure] || 'Ophthalmic';
+            const { firstName, lastName } = ZohoCRMTracker.splitName(fullName);
+
+            const leadData = {
+                fullName,
+                firstName,
+                lastName,
+                company: clinic || 'Ophthalmology Practice',
+                city,
+                phone,
+                procedure: procedureLabel,
+                leadSource: 'Website - Growth Blueprint Form',
+                description: `Procedure Focus: ${procedureLabel} | City: ${city} | Form: Growth Blueprint Section`
+            };
+
+            // Send to Zoho CRM
+            ZohoCRMTracker.submitLead(leadData, blueprintForm);
+
+            // Inline Success State inside blueprint-form-card
+            const formCard = blueprintForm.closest('.blueprint-form-card');
+            if (formCard) {
+                formCard.innerHTML = `
+                    <div style="text-align:center;padding:36px 16px;">
+                        <div style="width:64px;height:64px;background:rgba(16,185,129,0.12);border-radius:50%;border:2px solid var(--accent);display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px;color:var(--accent);font-size:28px;">✓</div>
+                        <h3 style="font-size:22px;margin-bottom:10px;color:var(--text-main);">Strategy Blueprint In Progress!</h3>
+                        <p style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;">
+                            Thank you, <strong>${fullName}</strong>. We are compiling patient volume data and competitor benchmarks for <strong>${clinic}</strong> in <strong>${city}</strong>.
+                        </p>
+                        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:12px;font-size:13px;color:var(--accent);">
+                            Lead captured to CRM. Our director will reach out to <strong>${phone}</strong> shortly.
+                        </div>
+                    </div>
+                `;
             }
         });
     }

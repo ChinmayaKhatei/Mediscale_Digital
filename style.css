@@ -222,6 +222,10 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
 }
 
+.header .nav-container {
+    padding-left: 12px;
+}
+
 .nav-container {
     display: flex;
     justify-content: space-between;
@@ -241,6 +245,7 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     gap: 14px;
     flex-shrink: 0;
+    margin-left: -8px; /* Shift logo slightly toward left in header */
 }
 
 .logo {
@@ -2243,6 +2248,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 580px) {
+    .header .nav-container {
+        padding-left: 8px;
+    }
+    .nav-brand-group {
+        margin-left: -4px;
+    }
     .nav-badge-pill {
         display: none;
     }
